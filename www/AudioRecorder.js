@@ -19,3 +19,15 @@ exports.stopRecord = function(success, error){
     error = error || noop;
     exec(success, error, "AudioRecorder", 'stopRecord');
 };
+exports.delRecord = function(options,success, error){
+    success = success || noop;
+    error = error || noop;
+
+    exec(success, error, "AudioRecorder", "delRecord",[options]);
+};
+
+exports.encodeBase64Record = function(path,success, error){
+    success = success || noop;
+    error = error || noop;
+    exec(success, error, "AudioRecorder", 'encodeBase64Record',[path]);
+};

@@ -13,8 +13,9 @@ import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import android.util.Base64;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
@@ -39,9 +40,16 @@ public class AudioRecorder extends CordovaPlugin {
         }else if(action.equals("stopRecord")) {
             stopRecord(callbackContext);
             return true;
+        }else if(action.equals("delRecord")) {
+            delRecord(args,callbackContext);
+            return true;
+        } else if(action.equals("encodeBase64Record")) {
+            encodeBase64Record(args,callbackContext);
+           return true;
         }
         return false;
     }
+
 
     private boolean requestRecordPermission(){
         boolean isPermissionGranted = cordova.hasPermission(Manifest.permission.RECORD_AUDIO);
@@ -136,4 +144,53 @@ public class AudioRecorder extends CordovaPlugin {
         }
     }
 
+    private void delRecord(JSONArray args, CallbackContext callbackContext){
+        if(!args.isNull(0)) {
+            try{
+                String filePath = (String) args.get(0);
+
+
+                File file = new File(filePath.substring(7));
+                 boolean BB =  file.isFile();
+                boolean KK =  file.exists();
+                if (file.isFile() && file.exists()) {
+                     file.delete();
+                }
+                callbackContext.success();
+            }catch (JSONException ex){
+                Log.e(TAG, ex.getMessage());
+                callbackContext.error(ex.getMessage());
+            }
+
+        }
+
+    }
+
+    private  void encodeBase64Record(JSONArray args, CallbackContext callbackContext)  {
+
+
+        if(!args.isNull(0)) {
+            try {
+                String path = (String) args.get(0);
+                File file = new File(path.substring(7));
+                boolean BB =  file.isFile();
+                boolean KK =  file.exists();
+                if (file.isFile() && file.exists()) {
+                    FileInputStream inputFile = new FileInputStream(file);
+                    byte[] buffer = new byte[(int) file.length()];
+                    inputFile.read(buffer);
+                    inputFile.close();
+                    String result = Base64.encodeToString(buffer, Base64.DEFAULT);
+                    callbackContext.success(result);
+                } else {
+
+                }
+            } catch (IOException e) {
+                callbackContext.error(e.getMessage());
+            }catch (JSONException ex){
+                callbackContext.error(ex.getMessage());
+            }
+        }
+
+    }
 }
